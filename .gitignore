@@ -1,2 +1,7 @@
 axa
 node_modules
+__pycache__
+*.log
+*.pyc
+*.db
+scratch.py
