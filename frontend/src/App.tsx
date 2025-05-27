@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Box, Typography, Grid, Button, Divider, TextField, Stack } from '@mui/material'
+import { Box, Typography, Grid, Button, Divider, TextField, Stack, Alert } from '@mui/material'
 import type { Book, NewBook } from './Types'
 import BookComponent from './Book'
 
@@ -11,8 +11,8 @@ function App() {
     title: '',
     author: ''
   })
-
   const [addingBook, setAddingBook] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchBooks = async () => {
     const response = await fetch('http://localhost:8000/books', {
@@ -34,7 +34,6 @@ function App() {
       ...prev,
       [field]: value,
     }))
-    // console.log(bookToAdd)
   }
 
   const handleBookAddCancel = () => {
@@ -55,6 +54,11 @@ function App() {
       body: JSON.stringify(bookToAdd),
     })
       .then((response) => {
+        if (!response.ok) {
+          console.log('Error adding book:', response.statusText)
+          setError('Failed to add book. Please try again.')
+          throw new Error('Network response was not ok')
+        }
         console.log('Book added successfully:', response.text())
         setAddingBook(false)
         fetchBooks()
@@ -123,6 +127,11 @@ function App() {
           </>
         )}
       </Box>
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
     </Box>
   )
 }
