@@ -1,5 +1,5 @@
 import { Card, CardActions, CardContent, Typography } from "@mui/material"
-import type { Book } from "./types"
+import type { Book } from "./Types"
 
 const BookComponent = ({ book }: { book: Book }) => {
     return (
@@ -8,7 +8,6 @@ const BookComponent = ({ book }: { book: Book }) => {
                 <Typography variant="h5">{book.title}</Typography>
                 <Typography variant="subtitle1">{book.author}</Typography>
                 <Typography variant="body2">Date Added: {book.dateAdded}</Typography>
-                <Typography variant="body2">Date Read: {book.dateRead}</Typography>
             </CardContent>
             <CardActions>
                 {/* Add any actions here */}

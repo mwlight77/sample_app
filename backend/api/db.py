@@ -16,7 +16,6 @@ class Book(SQLModel, table=True):
     date_added: datetime = Field(sa_column=Column(DATETIME, default=func.now()))
     title: str
     author: str
-    date_read: t.Optional[date] = Field(sa_column=Column(DATE, default=None))
 
 # Create the database tables
 SQLModel.metadata.create_all(engine)

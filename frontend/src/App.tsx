@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Box, Typography, Grid, Button, Divider, TextField, Stack } from '@mui/material'
-import type { Book, NewBook } from './types'
+import type { Book, NewBook } from './Types'
 import BookComponent from './Book'
 
 function App() {
@@ -9,25 +9,34 @@ function App() {
   const [books, setBooks] = useState<Book[]>([])
   const [bookToAdd, setBookToAdd] = useState<NewBook>({
     title: '',
-    author: '',
-    dateRead: '',
-    dateAdded: '',
+    author: ''
   })
 
   const [addingBook, setAddingBook] = useState<boolean>(false)
 
+  const fetchBooks = async () => {
+    const response = await fetch('http://localhost:8000/books', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await response.json()
+    setBooks(data)
+  }
+
   useEffect(() => {
-    const fetchBooks = async () => {
-      const response = await fetch('http://localhost:8000/books', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const data = await response.json()
-      setBooks(data)
-      console.log(data)
-    }
+    // const fetchBooks = async () => {
+    //   const response = await fetch('http://localhost:8000/books', {
+    //     method: 'GET',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   })
+    //   const data = await response.json()
+    //   setBooks(data)
+    //   // console.log(data)
+    // }
     fetchBooks()
   }, [])
 
@@ -36,21 +45,33 @@ function App() {
       ...prev,
       [field]: value,
     }))
-    console.log(bookToAdd)
+    // console.log(bookToAdd)
   }
 
-  const handleBookAddCancel = () =>{
+  const handleBookAddCancel = () => {
     setAddingBook(false)
     setBookToAdd({
       title: '',
       author: '',
-      dateRead: '',
-      dateAdded: '',
     })
   }
 
-  const handleNewBookSubmit = () => {
+  const handleNewBookSubmit = async () => {
     console.log(bookToAdd)
+    await fetch('http://localhost:8000/books', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookToAdd),
+    })
+      .then((response) => {
+        console.log('Book added successfully:', response.text())
+        setAddingBook(false)
+        fetchBooks()
+      }).catch((error) => {
+        console.error('Error adding book:', error)
+      })
   }
 
   return (
@@ -81,7 +102,7 @@ function App() {
             <Divider sx={{ backgroundColor: 'white' }} />
             <Box component='form' noValidate autoComplete='off'>
               <TextField
-                sx = {{color: 'white'}}
+                sx={{ color: 'white' }}
                 label="Title"
                 variant="outlined"
                 fullWidth
@@ -97,30 +118,14 @@ function App() {
                 onChange={(e) => handleNewBookChange('author', e.target.value)}
                 value={bookToAdd.author}
               />
-              <TextField
-                label="Date Read"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                onChange={(e) => handleNewBookChange('dateRead', e.target.value)}
-                value={bookToAdd.dateRead}
-              />
-              <TextField
-                label="Date Added"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                onChange={(e) => handleNewBookChange('dateAdded', e.target.value)}
-                value={bookToAdd.dateAdded}
-              />
             </Box>
             <Stack spacing={2} direction="row" justifyContent="center">
-            <Button variant="contained" color="secondary" onClick={() => handleBookAddCancel()}>
-              Cancel
-            </Button>
-            <Button variant="contained" color="primary" onClick={handleNewBookSubmit}>
-              Submit New Book
-            </Button>
+              <Button variant="contained" color="secondary" onClick={() => handleBookAddCancel()}>
+                Cancel
+              </Button>
+              <Button variant="contained" color="primary" onClick={handleNewBookSubmit}>
+                Submit New Book
+              </Button>
             </Stack>
           </>
         )}
