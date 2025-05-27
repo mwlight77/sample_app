@@ -30,6 +30,7 @@ function App() {
   }, [])
 
   const handleNewBookChange = (field: keyof NewBook, value: string) => {
+
     setBookToAdd((prev) => ({
       ...prev,
       [field]: value,
@@ -97,6 +98,7 @@ function App() {
         {addingBook && (
           <>
             <Divider sx={{ backgroundColor: 'white' }} />
+            <Typography variant="caption">Must be between 5 and 100 characters</Typography>
             <Box component='form' noValidate autoComplete='off'>
               <TextField
                 sx={{ color: 'white' }}
