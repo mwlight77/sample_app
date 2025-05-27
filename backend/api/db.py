@@ -7,7 +7,7 @@ from datetime import datetime, date
 # Database connection
 DATABASE_URL = "sqlite:///./readingList.db"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 
 # Define Tables
 class Book(SQLModel, table=True):
@@ -22,6 +22,7 @@ SQLModel.metadata.create_all(engine)
 
 # Create a database session
 def get_db():
+    """Provides a database session for dependency injection."""
     db = Session(engine)
     try:
         yield db

@@ -26,17 +26,6 @@ function App() {
   }
 
   useEffect(() => {
-    // const fetchBooks = async () => {
-    //   const response = await fetch('http://localhost:8000/books', {
-    //     method: 'GET',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   })
-    //   const data = await response.json()
-    //   setBooks(data)
-    //   // console.log(data)
-    // }
     fetchBooks()
   }, [])
 
@@ -69,6 +58,10 @@ function App() {
         console.log('Book added successfully:', response.text())
         setAddingBook(false)
         fetchBooks()
+        setBookToAdd({
+          title: '',
+          author: '',
+        })
       }).catch((error) => {
         console.error('Error adding book:', error)
       })

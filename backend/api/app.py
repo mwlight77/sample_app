@@ -30,9 +30,12 @@ from sqlmodel import Session, select
 
 from api.db import get_db, Book
 from api.models import BookRequest, BookResponse
+from api.axa_logging import get_axa_logger
 
 
 app = FastAPI(title="axa", description="API for axa", version="0.1.0")
+axa_logger = get_axa_logger()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,15 +47,27 @@ app.add_middleware(
 
 @app.post("/books")
 async def create_book(book: BookRequest, db: Session = Depends(get_db)):
-    book_record = Book(**book.model_dump())
-    with db.begin():
-        db.add(book_record)
-        db.commit()
-    return HTMLResponse(status_code=201, content="Book created successfully")
+    """Create a new book record in the database."""
+    axa_logger.info(f"Creating a new book: {book.title} by {book.author}")
+    try:
+        book_record = Book(**book.model_dump())
+        with db.begin():
+            db.add(book_record)
+            db.commit()
+        return HTMLResponse(status_code=201, content="Book created successfully")
+    except Exception as e:
+        axa_logger.error(f"Error creating book: {e}")
+        return HTMLResponse(status_code=500, content="Internal Server Error")
 
 @app.get("/books")
 async def get_books(db: Session = Depends(get_db)) -> t.List[BookResponse]:
-    statement = select(Book)
-    results = db.exec(statement).fetchall()
-    books = [BookResponse(**x.model_dump()) for x in results]
-    return books
+    """Fetch all books from the database"""
+    axa_logger.info("Fetching all books from the database")
+    try:
+        statement = select(Book)
+        results = db.exec(statement).fetchall()
+        books = [BookResponse(**x.model_dump()) for x in results]
+        return books
+    except Exception as e:
+        axa_logger.error(f"Error fetching books: {e}")
+        return HTMLResponse(status_code=500, content="Internal Server Error")
